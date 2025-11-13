@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AptiPro - Professional Aptitude Testing Platform</title>
+  <style>
+    /* ---------- Root Variables ---------- */
+    :root{
+      --primary:#4f46e5;
+      --primary-dark:#4338ca;
+      --secondary:#06b6d4;
+      --success:#10b981;
+      --danger:#ef4444;
+      --dark:#1f2937;
+      --light:#f3f4f6;
+      --white:#ffffff;
+      --shadow: 0 10px 25px rgba(0,0,0,0.08);
+      --shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
+      --max-width:1200px;
+    }
+
+    /* ---------- Reset & Body ---------- */
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color:var(--dark);
+      min-height:100vh;
+      overflow-x:hidden;
+      padding-bottom:40px;
+    }
+    a{color:inherit;text-decoration:none}
+
+    /* ---------- Navbar ---------- */
+    .navbar{
+      position:fixed;top:0;left:0;width:100%;z-index:1000;
+      background:rgba(255,255,255,0.98);backdrop-filter:blur(6px);
+      box-shadow:0 2px 20px rgba(0,0,0,0.06);
+    }
+    .nav-container{max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 20px}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--primary)}
+    .logo-icon{width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:white}
+    .nav-menu{display:flex;gap:10px;list-style:none}
+    .nav-link{padding:8px 12px;border-radius:10px;color:var(--dark);font-weight:500;display:flex;gap:6px;align-items:center}
+    .nav-link.active{background:linear-gradient(90deg,var(--primary),var(--primary-dark));color:#fff}
+    .menu-toggle{display:none;cursor:pointer}
+    .menu-toggle span{display:block;width:24px;height:3px;background:var(--dark);margin:4px 0;border-radius:3px}
+
+    /* ---------- Main Container ---------- */
+    .main-container{max-width:var(--max-width);margin:90px auto 30px;padding:20px}
+
+    /* ---------- Page Card ---------- */
+    .page{display:none}
+    .page.active{display:block;animation:fadeIn .35s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+    /* ---------- Hero / About / Services / Contact ---------- */
+    .card{background:var(--white);border-radius:16px;padding:28px;box-shadow:var(--shadow-lg);overflow:hidden}
+    .hero{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch}
+    .hero-content{padding:48px}
+    .hero-title{font-size:2.6rem;margin-bottom:12px;color:var(--dark);line-height:1.05}
+    .hero-sub{color:#6b7280;font-size:1.05rem;margin-bottom:18px}
+    .hero-feat{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+    .feature-item{display:flex;gap:10px;align-items:center}
+    .feature-icon{width:40px;height:40;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:white}
+
+    .hero-image{background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center}
+    .hero-graphic{font-size:140px;color:white;opacity:0.95}
+
+    /* ---------- Team / Services / About ---------- */
+    .about-content{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+    .team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+    .team-member{background:var(--light);padding:18px;border-radius:12px;text-align:center}
+
+    .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+    .service-card{background:var(--light);padding:20px;border-radius:12px;text-align:center}
+
+    /* ---------- Contact ---------- */
+    .contact-container{display:grid;grid-template-columns:1fr 1fr;gap:0}
+    .contact-info{background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:40px;color:white}
+    .contact-form{padding:40px}
+
+    .form-group{margin-bottom:12px}
+    .form-input{width:100%;padding:10px;border-radius:8px;border:2px solid #e6e6e6;font-size:1rem}
+
+    /* ---------- Footer ---------- */
+    .footer{max-width:var(--max-width);margin:20px auto;padding:18px;text-align:center;color:#fff;opacity:0.95}
+
+    /* ---------- Responsive ---------- */
+    @media (max-width:900px){ .hero{grid-template-columns:1fr} .about-content{grid-template-columns:1fr} .contact-container{grid-template-columns:1fr} .menu-toggle{display:block} .nav-menu{display:none;position:fixed;left:-100%;top:70px;width:100%;background:var(--white);flex-direction:column;padding:18px 0;transition:left .3s} .nav-menu.active{left:0} }
+
+    /* ---------- TEST SECTION STYLES (self-contained) ---------- */
+    /* placed late so it can override earlier card style if needed */
+    .test-container{background:var(--white);border-radius:16px;box-shadow:var(--shadow-lg);padding:18px;max-width:1100px;margin:30px auto}
+    .test-header{text-align:center;margin-bottom:10px}
+    .test-header h1{margin-bottom:6px}
+    .test-info-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:12px 0}
+    .timer{font-weight:700;background:#f3f4f6;padding:8px 12px;border-radius:8px;min-width:90px;text-align:center}
+    .score{font-weight:700;min-width:90px;text-align:center}
+    .progress-container{flex:1;margin:0 12px;min-width:160px}
+    .progress-bar{width:100%;height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+    .progress-fill{width:0%;height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-dark));transition:width .3s ease}
+
+    .test-tabs{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}
+    .test-tab{padding:8px 14px;border-radius:10px;border:1px solid transparent;background:var(--light);cursor:pointer}
+    .test-tab.active{background:linear-gradient(90deg,var(--primary),var(--primary-dark));color:white}
+    .test-instructions{background:#fff7ed;padding:12px;border-radius:10px;margin-bottom:12px;color:#92400e}
+    .test-section{display:none}
+    .test-section.active{display:block}
+    .question-card{background:var(--light);padding:14px;border-radius:12px;margin-bottom:12px;border:1px solid transparent}
+    .question-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .qno{font-weight:700;color:var(--primary)}
+    .qtext{margin-bottom:10px;color:var(--dark)}
+    .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+    .option{padding:10px;border-radius:10px;background:var(--white);border:2px solid #e5e7eb;cursor:pointer;display:flex;gap:10px;align-items:center;user-select:none}
+    .option .opt{font-weight:700;margin-right:6px;color:var(--primary)}
+    .option.selected{background:linear-gradient(90deg,var(--primary),var(--primary-dark));color:white}
+    .option.correct{outline:3px solid rgba(16,185,129,0.12)}
+    .option.wrong{outline:3px solid rgba(239,68,68,0.12);opacity:0.95}
+    .result-box{text-align:center;padding:20px}
+    .result-score-show{font-size:2.2rem;font-weight:800;color:var(--primary);margin-bottom:6px}
+    .result-msg{margin-bottom:12px;color:var(--dark);font-weight:600}
+    .result-stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+    .result-stats .stat{background:var(--light);padding:8px 12px;border-radius:8px}
+    .btn{padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+    .btn-primary{background:linear-gradient(90deg,var(--primary),var(--primary-dark));color:white}
+    @media (max-width:700px){ .options{grid-template-columns:1fr} .test-info-bar{gap:6px} }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo" onclick="showPage('home', event)"><div class="logo-icon">🧠</div><span>Aptitude Pro Skills</span></a>
+
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="#" class="nav-link active" onclick="showPage('home', event)"><span>🏠</span>&nbsp;Home</a></li>
+        <li><a href="#" class="nav-link" onclick="showPage('about', event)"><span>ℹ️</span>&nbsp;About</a></li>
+        <li><a href="#" class="nav-link" onclick="showPage('services', event)"><span>🛠️</span>&nbsp;Services</a></li>
+        <li><a href="#" class="nav-link" onclick="showPage('test', event)"><span>📝</span>&nbsp;Take Test</a></li>
+        <li><a href="#" class="nav-link" onclick="showPage('contact', event)"><span>📞</span>&nbsp;Contact</a></li>
+      </ul>
+
+      <div class="menu-toggle" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main-container">
+    <!-- HOME -->
+    <div id="home" class="page active">
+      <div class="card hero">
+        <div class="hero-content">
+          <h1 class="hero-title">Master Your Interview Skills</h1>
+          <p class="hero-sub">Prepare for success with our comprehensive aptitude testing platform. Practice, learn, and excel in your career journey.</p>
+
+          <div class="hero-feat">
+            <div class="feature-item"><div class="feature-icon">✓</div><div>500+ Questions</div></div>
+            <div class="feature-item"><div class="feature-icon">⏱️</div><div>Timed Tests</div></div>
+            <div class="feature-item"><div class="feature-icon">📊</div><div>Performance Analytics</div></div>
+            <div class="feature-item"><div class="feature-icon">🎯</div><div>Expert Curated</div></div>
+          </div>
+
+          <div style="display:flex;gap:12px">
+            <button class="btn btn-primary" onclick="showPage('test', event)">🚀 Start Test Now</button>
+            <button class="btn" onclick="showPage('about', event)">📖 Learn More</button>
+          </div>
+        </div>
+
+        <div class="hero-image">
+          <div class="hero-graphic">📚</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div id="about" class="page">
+      <div class="card about-container">
+        <div style="text-align:center;margin-bottom:18px"><h2>About AptiPro</h2><p style="color:#6b7280">Empowering professionals worldwide since 2020</p></div>
+        <div class="about-content">
+          <div>
+            <h3 style="color:var(--primary)">Our Mission</h3>
+            <p>Help job seekers excel by providing top-quality aptitude testing and interview preparation resources.</p>
+            <h3 style="color:var(--primary)">What We Do</h3>
+            <p>Comprehensive aptitude tests covering quantitative reasoning, logical thinking, verbal ability, and pattern recognition.</p>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="background:#fff;padding:12px;border-radius:10px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--primary)">50K+</div><div style="color:#6b7280">Active Users</div></div>
+            <div style="background:#fff;padding:12px;border-radius:10px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--primary)">1000+</div><div style="color:#6b7280">Questions</div></div>
+            <div style="background:#fff;padding:12px;border-radius:10px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--primary)">95%</div><div style="color:#6b7280">Success Rate</div></div>
+            <div style="background:#fff;padding:12px;border-radius:10px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--primary)">24/7</div><div style="color:#6b7280">Support</div></div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px">
+          <h3 style="text-align:center">Meet Our Team</h3>
+          <div class="team-grid">
+            <div class="team-member"><div style="font-size:34px">👨‍💼</div><h4>John Smith</h4><div style="color:var(--primary)">CEO & Founder</div></div>
+            <div class="team-member"><div style="font-size:34px">👩‍💼</div><h4>Sarah Johnson</h4><div style="color:var(--primary)">Head of Content</div></div>
+            <div class="team-member"><div style="font-size:34px">👨‍💻</div><h4>Mike Chen</h4><div style="color:var(--primary)">Tech Lead</div></div>
+            <div class="team-member"><div style="font-size:34px">👩‍🏫</div><h4>Emily Davis</h4><div style="color:var(--primary)">Career Coach</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div id="services" class="page">
+      <div class="card services-container">
+        <div style="text-align:center;margin-bottom:18px"><h2>Our Services</h2><p style="color:#6b7280">Comprehensive solutions for your interview preparation</p></div>
+        <div class="services-grid">
+          <div class="service-card"><div style="font-size:28px">📊</div><h3>Aptitude Testing</h3><p>Comprehensive tests with instant feedback.</p></div>
+          <div class="service-card"><div style="font-size:28px">🎯</div><h3>Mock Interviews</h3><p>Practice real interview scenarios.</p></div>
+          <div class="service-card"><div style="font-size:28px">📈</div><h3>Performance Analytics</h3><p>Detailed insights into strengths & weaknesses.</p></div>
+          <div class="service-card"><div style="font-size:28px">📚</div><h3>Study Materials</h3><p>Curated resources and practice papers.</p></div>
+          <div class="service-card"><div style="font-size:28px">👥</div><h3>Group Sessions</h3><p>Live workshops & doubt clearing.</p></div>
+          <div class="service-card"><div style="font-size:28px">🏆</div><h3>Certification</h3><p>Skill badges and certificates.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div id="contact" class="page">
+      <div class="card contact-container" style="border-radius:16px;overflow:hidden">
+        <div class="contact-info">
+          <h2>Get in Touch</h2>
+          <p>We're here to help you succeed. Reach out for any queries or support.</p>
+          <div style="margin-top:20px">
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><div style="width:40px;height:40;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;border-radius:8px">📍</div><div><strong>Office Address</strong><div>123 Tech Park, Silicon Valley, CA 94025</div></div></div>
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><div style="width:40px;height:40;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;border-radius:8px">📧</div><div><strong>Email</strong><div>support@aptipro.com</div></div></div>
+            <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;border-radius:8px">📞</div><div><strong>Phone</strong><div>+1 (555) 123-4567</div></div></div>
+          </div>
+        </div>
+
+        <div class="contact-form">
+          <h2>Send us a Message</h2>
+          <form onsubmit="handleContactForm(event)">
+            <div class="form-group"><label>Full Name</label><input class="form-input" type="text" placeholder="Enter your name" required></div>
+            <div class="form-group"><label>Email</label><input class="form-input" type="email" placeholder="your@email.com" required></div>
+            <div class="form-group"><label>Subject</label><input class="form-input" type="text" placeholder="How can we help?" required></div>
+            <div class="form-group"><label>Message</label><textarea class="form-input" rows="5" placeholder="Tell us more..." required></textarea></div>
+            <button class="btn btn-primary" type="submit">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEST (FULL) - REPLACE THE OLD TEST SECTION -->
+    <div id="test" class="page">
+      <div class="test-container">
+        <header class="test-header">
+          <h1>Interview Aptitude Test Pro</h1>
+          <p>Master your skills with concise practice tests</p>
+        </header>
+
+        <!-- Info Bar -->
+        <div class="test-info-bar">
+          <div class="timer"><span id="timer">30:00</span></div>
+          <div class="progress-container"><div class="progress-bar"><div class="progress-fill" id="progress"></div></div></div>
+          <div class="score"><span id="score">0/12</span></div>
+        </div>
+
+        <!-- Tabs -->
+        <nav class="test-tabs" role="tablist">
+          <button class="test-tab active" onclick="showSection('quantitative', event)">Quantitative</button>
+          <button class="test-tab" onclick="showSection('logical', event)">Logical</button>
+          <button class="test-tab" onclick="showSection('verbal', event)">Verbal</button>
+          <button class="test-tab" onclick="showSection('pattern', event)">Pattern</button>
+          <button class="test-tab" onclick="showSection('result', event)">Results</button>
+        </nav>
+
+        <!-- Instructions -->
+        <div class="test-instructions" aria-live="polite">
+          <strong>Instructions:</strong>
+          <ul style="margin:8px 0 0 18px;">
+            <li>Each question has four options. Select the correct answer.</li>
+            <li>Total time: <b>30 minutes</b>. Timer starts when you open this test page.</li>
+            <li>Each correct = 1 point. No negative marking.</li>
+          </ul>
+        </div>
+
+        <!-- Sections -->
+        <main class="test-content">
+          <!-- Quantitative -->
+          <section id="quantitative" class="test-section active">
+            <div class="question-card" data-q="Q1">
+              <div class="question-top"><span class="qno">Q1</span><span class="qtype">Arithmetic</span></div>
+              <p class="qtext">If a train travels 300 km in 4 hours, what is its average speed?</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>60 km/h</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>75 km/h</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>80 km/h</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>90 km/h</div>
+              </div>
+            </div>
+
+            <div class="question-card" data-q="Q2">
+              <div class="question-top"><span class="qno">Q2</span><span class="qtype">Percentage</span></div>
+              <p class="qtext">What is 35% of 400?</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>120</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>140</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>150</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>160</div>
+              </div>
+            </div>
+
+            <div class="question-card" data-q="Q3">
+              <div class="question-top"><span class="qno">Q3</span><span class="qtype">Algebra</span></div>
+              <p class="qtext">If 2x + 5 = 13, what is the value of x?</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>3</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>4</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>5</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>6</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Logical -->
+          <section id="logical" class="test-section">
+            <div class="question-card" data-q="Q4">
+              <div class="question-top"><span class="qno">Q4</span><span class="qtype">Series</span></div>
+              <p class="qtext">Complete the series: 2, 6, 12, 20, 30, ?</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>40</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>42</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>44</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>46</div>
+              </div>
+            </div>
+
+            <div class="question-card" data-q="Q5">
+              <div class="question-top"><span class="qno">Q5</span><span class="qtype">Analogy</span></div>
+              <p class="qtext">Doctor is to Hospital as Teacher is to ?</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>Student</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>School</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>Book</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>Knowledge</div>
+              </div>
+            </div>
+
+            <div class="question-card" data-q="Q6">
+              <div class="question-top"><span class="qno">Q6</span><span class="qtype">Coding-Decoding</span></div>
+              <p class="qtext">If CAT is coded as 3120, how is DOG coded?</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>4157</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>4167</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>4177</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>4187</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Verbal -->
+          <section id="verbal" class="test-section">
+            <div class="question-card" data-q="Q7">
+              <div class="question-top"><span class="qno">Q7</span><span class="qtype">Synonym</span></div>
+              <p class="qtext">Choose the synonym for "Eloquent"</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>Silent</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>Articulate</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>Confused</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>Simple</div>
+              </div>
+            </div>
+
+            <div class="question-card" data-q="Q8">
+              <div class="question-top"><span class="qno">Q8</span><span class="qtype">Antonym</span></div>
+              <p class="qtext">Choose the antonym for "Virtuous"</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>Good</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>Wicked</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>Kind</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>Honest</div>
+              </div>
+            </div>
+
+            <div class="question-card" data-q="Q9">
+              <div class="question-top"><span class="qno">Q9</span><span class="qtype">Reading</span></div>
+              <p class="qtext">What is the main theme of the passage about rapid advancement of technology?</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>Technology's impact on life</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>Healthcare improvements</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>Communication methods</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>Human evolution</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Pattern -->
+          <section id="pattern" class="test-section">
+            <div class="question-card" data-q="Q10">
+              <div class="question-top"><span class="qno">Q10</span><span class="qtype">Number Pattern</span></div>
+              <p class="qtext">Find the missing number: 1,4,9,16,25, ?</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>30</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>35</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>36</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>49</div>
+              </div>
+            </div>
+
+            <div class="question-card" data-q="Q11">
+              <div class="question-top"><span class="qno">Q11</span><span class="qtype">Letter Pattern</span></div>
+              <p class="qtext">Complete series: A, C, F, J, O, ?</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>S</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>T</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>U</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>V</div>
+              </div>
+            </div>
+
+            <div class="question-card" data-q="Q12">
+              <div class="question-top"><span class="qno">Q12</span><span class="qtype">Geometric</span></div>
+              <p class="qtext">If first shape = triangle (3 sides), what is the 5th shape?</p>
+              <div class="options">
+                <div class="option" onclick="selectOption(this)"><span class="opt">A</span>Pentagon (5 sides)</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">B</span>Hexagon (6 sides)</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">C</span>Heptagon (7 sides)</div>
+                <div class="option" onclick="selectOption(this)"><span class="opt">D</span>Octagon (8 sides)</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Results -->
+          <section id="result" class="test-section">
+            <div class="result-box">
+              <div class="result-score-show" id="finalPercent">0%</div>
+              <p class="result-msg" id="finalMessage">Your result will appear here.</p>
+              <div class="result-stats">
+                <div class="stat">Total Questions: <b id="statTotal">12</b></div>
+                <div class="stat">Correct: <b id="statCorrect">0</b></div>
+                <div class="stat">Time Taken: <b id="statTime">00:00</b></div>
+                <div class="stat">Accuracy: <b id="statAccuracy">0%</b></div>
+              </div>
+              <div class="result-actions">
+                <button class="btn btn-primary" onclick="restartTest()">Restart Test</button>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div style="max-width:var(--max-width);margin:0 auto;">
+      <div style="margin-bottom:8px">
+        <a href="#" onclick="showPage('home', event)" style="color:white;margin-right:14px">Home</a>
+        <a href="#" onclick="showPage('about', event)" style="color:white;margin-right:14px">About</a>
+        <a href="#" onclick="showPage('services', event)" style="color:white;margin-right:14px">Services</a>
+        <a href="#" onclick="showPage('contact', event)" style="color:white;margin-right:14px">Contact</a>
+      </div>
+      <div style="color:white;opacity:0.9">© 2024 AptiPro. All rights reserved. Made with ❤️ for job seekers.</div>
+    </div>
+  </footer>
+
+  <!-- ---------- SCRIPTS ---------- -->
+  <script>
+    /* ---------- Navigation & Mobile Menu ---------- */
+    function toggleMenu(){ document.getElementById('navMenu').classList.toggle('active'); }
+
+    function showPage(pageId, evt){
+      // hide all pages
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      const page = document.getElementById(pageId);
+      if (page) page.classList.add('active');
+
+      // update nav links
+      document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+      // find nav link by text - robust enough for this small site
+      document.querySelectorAll('.nav-menu a, .nav-menu li a').forEach((link)=>{
+        if (link.textContent.trim().toLowerCase().includes(pageId)) link.classList.add('active');
+      });
+
+      // close mobile menu
+      document.getElementById('navMenu').classList.remove('active');
+
+      // If test page opened, start timer; otherwise stop
+      if (pageId === 'test') {
+        // put focus to first test tab
+        showSection('quantitative', evt);
+      } else {
+        // stop any running test timer
+        if (window.testTimerInterval) { clearInterval(window.testTimerInterval); window.testTimerInterval = null; }
+      }
+    }
+
+    /* ---------- Contact Form Handler ---------- */
+    function handleContactForm(e){
+      e.preventDefault();
+      alert('Thank you for your message! We will get back to you soon.');
+      e.target.reset();
+    }
+
+    /* ---------- TEST: Data & State ---------- */
+    const rightAnswers = {
+      Q1: "B", Q2: "B", Q3: "B",
+      Q4: "B", Q5: "B", Q6: "B",
+      Q7: "B", Q8: "B", Q9: "A",
+      Q10: "C", Q11: "A", Q12: "A"
+    };
+
+    let testTimerInterval = null;
+    let timeLeft = 1800; // 30 minutes in seconds
+    let totalQuestions = Object.keys(rightAnswers).length;
+    let userAnswers = {}; // e.g., {Q1: "A"}
+    // expose interval var on window for global control if needed
+    window.testTimerInterval = null;
+
+    function startTimerOnce(){
+      if (window.testTimerInterval) return; // already running
+      window.testTimerInterval = setInterval(()=>{
+        timeLeft--;
+        updateTimerUI();
+        if (timeLeft <= 0){
+          clearInterval(window.testTimerInterval);
+          window.testTimerInterval = null;
+          showResults();
+        }
+      },1000);
+    }
+
+    function updateTimerUI(){
+      const minutes = Math.floor(timeLeft/60).toString().padStart(2,'0');
+      const seconds = (timeLeft%60).toString().padStart(2,'0');
+      const timerEl = document.getElementById('timer');
+      if (timerEl) timerEl.textContent = `${minutes}:${seconds}`;
+    }
+
+    /* ---------- Tabs & Sections ---------- */
+    function showSection(sectionId, evt){
+      // start timer when test first viewed
+      startTimerOnce();
+
+      // hide sections, show target
+      document.querySelectorAll('.test-section').forEach(s=>s.classList.remove('active'));
+      const s = document.getElementById(sectionId);
+      if (s) s.classList.add('active');
+
+      // tab active mark
+      document.querySelectorAll('.test-tab').forEach(t=>t.classList.remove('active'));
+      if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
+
+      // if results tab, compute results
+      if (sectionId === 'result') showResults();
+    }
+
+    /* ---------- Option Selection ---------- */
+    function selectOption(el){
+      const card = el.closest('.question-card');
+      if (!card) return;
+      const qid = card.getAttribute('data-q'); // e.g., 'Q1'
+      const letter = el.querySelector('.opt').textContent.trim();
+
+      const prev = card.querySelector('.option.selected');
+      if (prev === el) return; // clicking same selection does nothing
+
+      if (prev) prev.classList.remove('selected');
+      el.classList.add('selected');
+      userAnswers[qid] = letter;
+      updateScoreAndProgress();
+    }
+
+    function updateScoreAndProgress(){
+      const answeredCount = Object.keys(userAnswers).length;
+      let correct = 0;
+      for (const q of Object.keys(rightAnswers)){
+        if (userAnswers[q] && userAnswers[q] === rightAnswers[q]) correct++;
+      }
+      const scoreEl = document.getElementById('score');
+      if (scoreEl) scoreEl.textContent = `${correct}/${totalQuestions}`;
+
+      const progressEl = document.getElementById('progress');
+      if (progressEl) progressEl.style.width = `${(answeredCount/totalQuestions)*100}%`;
+    }
+
+    /* ---------- Show Results ---------- */
+    function showResults(){
+      if (window.testTimerInterval){ clearInterval(window.testTimerInterval); window.testTimerInterval = null; }
+      // compute score
+      let correct = 0;
+      for (const q of Object.keys(rightAnswers)){
+        if (userAnswers[q] && userAnswers[q] === rightAnswers[q]) correct++;
+      }
+      const percent = Math.round((correct/totalQuestions)*100);
+      const timeTaken = 1800 - timeLeft;
+      const minutes = Math.floor(timeTaken/60).toString().padStart(2,'0');
+      const seconds = (timeTaken%60).toString().padStart(2,'0');
+
+      // update result panel
+      const finalPercent = document.getElementById('finalPercent');
+      if (finalPercent) finalPercent.textContent = `${percent}%`;
+      const finalMessage = document.getElementById('finalMessage');
+      if (finalMessage) finalMessage.textContent = percent >= 80 ? "Excellent Performance!" : (percent >= 60 ? "Good Job! You've passed." : "Keep Practicing! You can do better.");
+      document.getElementById('statTotal').textContent = totalQuestions;
+      document.getElementById('statCorrect').textContent = correct;
+      document.getElementById('statTime').textContent = `${minutes}:${seconds}`;
+      document.getElementById('statAccuracy').textContent = `${percent}%`;
+
+      // mark correct/wrong on cards
+      document.querySelectorAll('.question-card').forEach(card=>{
+        const id = card.getAttribute('data-q');
+        const correctLetter = rightAnswers[id];
+        card.querySelectorAll('.option').forEach(opt=>{
+          opt.classList.remove('correct','wrong');
+          const letter = opt.querySelector('.opt').textContent.trim();
+          if (letter === correctLetter) opt.classList.add('correct');
+          if (userAnswers[id] && userAnswers[id] !== correctLetter && letter === userAnswers[id]) opt.classList.add('wrong');
+        });
+      });
+
+      // show results section
+      document.querySelectorAll('.test-section').forEach(s=>s.classList.remove('active'));
+      const r = document.getElementById('result');
+      if (r) r.classList.add('active');
+      // set results tab active
+      document.querySelectorAll('.test-tab').forEach(t=>t.classList.remove('active'));
+      const tabList = Array.from(document.querySelectorAll('.test-tab'));
+      const resTab = tabList.find(btn=>btn.textContent.trim().toLowerCase() === 'results');
+      if (resTab) resTab.classList.add('active');
+    }
+
+    /* ---------- Restart Test ---------- */
+    function restartTest(){
+      timeLeft = 1800;
+      if (window.testTimerInterval){ clearInterval(window.testTimerInterval); window.testTimerInterval = null; }
+      userAnswers = {};
+      // reset UI
+      updateTimerUI();
+      document.getElementById('score').textContent = `0/${totalQuestions}`;
+      document.getElementById('progress').style.width = '0%';
+      document.getElementById('finalPercent').textContent = '0%';
+      document.getElementById('finalMessage').textContent = 'Your result will appear here.';
+      document.getElementById('statCorrect').textContent = '0';
+      document.getElementById('statTime').textContent = '00:00';
+      document.getElementById('statAccuracy').textContent = '0%';
+      // clear option classes
+      document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected','correct','wrong'));
+      // go to first section
+      document.querySelectorAll('.test-section').forEach(s=>s.classList.remove('active'));
+      const q = document.getElementById('quantitative'); if (q) q.classList.add('active');
+      document.querySelectorAll('.test-tab').forEach(t=>t.classList.remove('active'));
+      const firstTab = document.querySelector('.test-tab'); if (firstTab) firstTab.classList.add('active');
+      // start timer
+      startTimerOnce();
+    }
+
+    /* ---------- Initialize ---------- */
+    (function init(){
+      // set initial score / total
+      document.getElementById('score').textContent = `0/${totalQuestions}`;
+      document.getElementById('statTotal').textContent = totalQuestions;
+      // if test page active on load, start timer
+      if (document.getElementById('test').classList.contains('active')) startTimerOnce();
+    })();
+  </script>
+</body>
+</html>
